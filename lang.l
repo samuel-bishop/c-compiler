@@ -4,7 +4,7 @@
 //
 // scanner definition file. flex uses this file to create the scanner
 //
-// Author: <<<< insert your name here >>>>
+// Author: <<<< Samuel Bishop  >>>>
 //
 
 #include "lex.h"
@@ -32,9 +32,49 @@ int Return(int val);
 period          ['.']
 %%
 
-    // token definitions. I gave "program" as an example
-"program"                   DO_RETURN(PROGRAM);
+    // token rules. I gave "program" as an example
+"("                         DO_RETURN('(');
+")"                         DO_RETURN(')');
+"{"                         DO_RETURN('{');
+"}"                         DO_RETURN('}');
+"["                         DO_RETURN('[');
+"]"                         DO_RETURN(']');
+";"                         DO_RETURN(';');
+","                         DO_RETURN(',');
+"."                         DO_RETURN('.');
+"+"                         DO_RETURN('+');
+"-"                         DO_RETURN('-');
+"*"                         DO_RETURN('*');
+"/"                         DO_RETURN('/');
+"%"                         DO_RETURN('%');
+"="                         DO_RETURN('=');
 
+"!="                        DO_RETURN(NOT_EQUALS);
+"=="                        DO_RETURN(EQUALS);
+"&&"                        DO_RETURN(AND);
+"||"                        DO_RETURN(OR);
+
+"program"                   DO_RETURN(PROGRAM);
+"if"                        DO_RETURN(IF);
+"else"                      DO_RETURN(ELSE);
+"endif"                     DO_RETURN(ENDIF);
+"while"                     DO_RETURN(WHILE);
+"print"                     DO_RETURN(PRINT);
+"int"                       DO_RETURN(INT);
+"float"                     DO_RETURN(FLOAT);
+"char"                      DO_RETURN(CHAR);
+"struct"                    DO_RETURN(STRUCT);
+"array"                     DO_RETURN(ARRAY);
+"return"                    DO_RETURN(RETURN);
+
+[0-9]+                      DO_RETURN(INT_VAL);
+[0-9]*[.][0-9]+             DO_RETURN(FLOAT_VAL);
+[_a-zA-Z][_a-zA-Z0-9]*      DO_RETURN(IDENTIFIER);
+
+[ \n\t\r\f]+                {} 
+[/][/].*                    {}
+
+.                           DO_RETURN(JUNK_TOKEN);
 %%
 
 // This function allows us to do extra processing on each token
