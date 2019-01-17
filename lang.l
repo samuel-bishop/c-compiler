@@ -9,7 +9,9 @@
 
 #include "lex.h"
 #include "tokens.h"
-
+#include "cSymbolTable.h"
+#include <list>
+using std::list;
 // Macros that can be used to create debug output from the scanner
 // The first one does NOT create debug output, the second does.
 // Uncomment one or the other then use DO_RETURN(val) for all your return 
@@ -18,6 +20,16 @@
 //#define DO_RETURN(a) { return Return(a); }
 
 int Return(int val);
+cSymbolTable *IncreaseScope();
+cSymbolTable *DecreaseScope();
+int identifier();
+int increaseScope();
+int decreaseScope();
+
+typedef unordered_map<string, cSymbol*> map;
+map *currentTable;
+extern list<cSymbolTable> g_list;
+extern cSymbolTable g_symbolTable;
 
 %}
 
@@ -26,17 +38,11 @@ int Return(int val);
 %option nounput
 %option yylineno
 
-
-    /* definitions go here. period is an example. */
-    /* NOTE: You do not need to use definitions */
-period          ['.']
 %%
-
-    // token rules. I gave "program" as an example
 "("                         DO_RETURN('(');
 ")"                         DO_RETURN(')');
-"{"                         DO_RETURN('{');
-"}"                         DO_RETURN('}');
+"{"                         DO_RETURN(increaseScope());
+"}"                         DO_RETURN(decreaseScope());
 "["                         DO_RETURN('[');
 "]"                         DO_RETURN(']');
 ";"                         DO_RETURN(';');
@@ -68,8 +74,8 @@ period          ['.']
 "return"                    DO_RETURN(RETURN);
 
 [0-9]+                      DO_RETURN(INT_VAL);
-[0-9]*[.][0-9]+             DO_RETURN(FLOAT_VAL);
-[_a-zA-Z][_a-zA-Z0-9]*      DO_RETURN(IDENTIFIER);
+[0-9]+[.][0-9]+             DO_RETURN(FLOAT_VAL);
+[_a-zA-Z][_a-zA-Z0-9]*      DO_RETURN(identifier());
 
 [ \n\t\r\f]+                {} 
 [/][/].*                    {}
@@ -83,4 +89,30 @@ int Return(int val)
 {
     printf("Scanned '%s': %d\n", yytext, val);
     return val;
+}
+
+int increaseScope() {
+    currentTable = g_symbolTable.IncreaseScope();
+    return '{';
+}
+
+int identifier() {
+    cSymbol * sym = g_symbolTable.FindLocal(yytext);
+    if (sym == nullptr) {
+        cSymbol * temp = new cSymbol(yytext);
+        g_symbolTable.Insert(temp);
+        yylval.symbol = temp;
+    }
+    else
+    {
+        yylval.symbol = sym;
+    }
+    return IDENTIFIER;
+    
+}
+
+int decreaseScope()
+{
+    currentTable = g_symbolTable.DecreaseScope();
+    return '}';
 }
