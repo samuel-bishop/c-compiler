@@ -28,8 +28,7 @@ class cSymbolTable
         }
 
         // INCREASE THE SCOPE: ADD A LEVEL TO THE NESTED SYMBOL TABLE
-        // RETURN VALUE IS THE NEWLY CREATED SCOPE
-        
+        // RETURN VALUE IS THE NEWLY CREATED SCOPE        
         map *IncreaseScope()
         {
             map * temp = new map();
@@ -58,19 +57,19 @@ class cSymbolTable
         // DO A LOOKUP IN THE NESTED TABLE. 
         // RETURN THE SYMBOL FOR THE OUTER-MOST MATCH. 
         // RETURNS NULLPTR IF NO MATCH IS FOUND.
-        /*cSymbol *Find(string name)
+        cSymbol *Find(string name)
         {
             cSymbol * sym;
-            for(cSymbolTable * scope : g_list)
+            for(map* scope : g_list)
             {
-                sym = scope->FindLocal(name);
+                sym = (*scope)[name];
                 if(sym != nullptr)
                 {
                     return sym;
                 }
             }
-            return sym;
-            }*/
+            return nullptr;
+        }
 
         // FIND A SYMBOL IN THE OUTER-MOST SCOPE.
         // NOTE: DOES NOT SEARCH NESTED SCOPES, ONLY THE OUTERMOST SCOPE.
