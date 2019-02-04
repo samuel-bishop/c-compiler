@@ -37,7 +37,7 @@ cSymbol(string name) : cAstNode()
             result += "\" name=\"" + m_name + "\"";
             return result;
         }
-        virtual string NodeType() { return string("symbol"); }
+        virtual string NodeType() { return string("sym"); }
         virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
     protected:
         static long long nextId;        // Next avail symbol ID

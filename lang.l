@@ -16,8 +16,8 @@ using std::list;
 // The first one does NOT create debug output, the second does.
 // Uncomment one or the other then use DO_RETURN(val) for all your return 
 // statements
-//#define DO_RETURN(a) { return (a); }
-#define DO_RETURN(a) { return Return(a); }
+#define DO_RETURN(a) { return (a); }
+//#define DO_RETURN(a) { return Return(a); }
 
 int Return(int val);
 cSymbolTable *IncreaseScope();
@@ -25,10 +25,6 @@ cSymbolTable *DecreaseScope();
 int identifier();
 int increaseScope();
 int decreaseScope();
-
-symbolTable_t *currentTable;
-extern list<symbolTable_t*> g_list;
-extern cSymbolTable g_symbolTable;
 
 %}
 

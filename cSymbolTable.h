@@ -44,6 +44,9 @@ class cSymbolTable
         // CREATE A SYMBOL TABLE
         cSymbolTable()
         {
+            symbolTable_t * newTable = new symbolTable_t();
+            g_list.push_front(newTable);
+
             cSymbol * character = new cSymbol("char");
             character->SetType(true);
             g_list.front()->Insert(character);
