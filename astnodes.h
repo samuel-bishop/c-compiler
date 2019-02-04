@@ -26,3 +26,5 @@
 #include "cIntExprNode.h"
 #include "cOpNode.h"
 #include "cBinaryExprNode.h"
+#include "cIfNode.h"
+#include "cReturnNode.h"

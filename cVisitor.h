@@ -26,6 +26,8 @@ class cStmtsNode;
 class cSymbol;
 class cBinaryExprNode;
 class cFloatExprNode;
+class cIfNode;
+class cReturnNode;
 
 class cVisitor
 {
@@ -50,6 +52,9 @@ class cVisitor
         virtual void Visit(cFloatExprNode *node);
         virtual void Visit(cVarExprNode *node);
         virtual void Visit(cVarDeclNode *node);
+        virtual void Visit(cIfNode *node);
+        virtual void Visit(cReturnNode *node);
+
     protected:
         void PreVisitAllNodes(cAstNode *node);
         void PostVisitAllNodes(cAstNode *node);

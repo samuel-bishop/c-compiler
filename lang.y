@@ -25,7 +25,7 @@
     cProgramNode*   program_node;
     cBlockNode*     block_node;
     cStmtsNode*     stmts_node;
-    cPrintNode*     stmt_node;
+    cStmtNode*      stmt_node;
     cExprNode*      expr_node;
     cIntExprNode*   int_node;
     cSymbol*        symbol;
@@ -34,6 +34,8 @@
     cVarDeclNode*   vardecl_node;
     cVarExprNode*   varexpr_node;
     symbolTable_t*  symbol_table;
+    cIfNode*        if_node;
+    cReturnNode*    return_node;
     }
 
 %{
@@ -138,9 +140,9 @@ stmts:      stmts stmt          { $$->Insert($2); }
         |   stmt                { $$ = new cStmtsNode($1); }
 
 stmt:       IF '(' expr ')' stmts ENDIF ';'
-                                {  }
+                                { $$ = new cIfNode($3, $5, nullptr); }
         |   IF '(' expr ')' stmts ELSE stmts ENDIF ';'
-                                {  }
+                                { $$ = new cIfNode($3, $5, $7); }
         |   WHILE '(' expr ')' stmt 
                                 {  }
         |   PRINT '(' expr ')' ';'
@@ -149,7 +151,7 @@ stmt:       IF '(' expr ')' stmts ENDIF ';'
         |   lval '=' func_call ';'   {  }
         |   func_call ';'       {  }
         |   block               {  }
-        |   RETURN expr ';'     {  }
+        |   RETURN expr ';'     { $$ = new cReturnNode($2); }
         |   error ';'           {}
 
 func_call:  IDENTIFIER '(' params ')' {  }
@@ -180,7 +182,7 @@ term:       term '*' fact       { $$ = new cBinaryExprNode($1, new cOpNode('*'),
         |   term '%' fact       { $$ = new cBinaryExprNode($1, new cOpNode('%'), $3); }
         |   fact                { $$ = $1; }
 
-fact:        '(' expr ')'       {  }
+fact:        '(' expr ')'       { $$ = $2; }
         |   INT_VAL             { $$ = new cIntExprNode($1); }
         |   FLOAT_VAL           { $$ = new cFloatExprNode($1); }
         |   varref              { $$ = new cVarExprNode($1); }

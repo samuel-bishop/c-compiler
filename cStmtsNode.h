@@ -8,7 +8,6 @@
 // phil.howard@oit.edu
 //
 
-#include "cAstNode.h"
 #include "cStmtNode.h"
 
 class cStmtsNode : public cAstNode
