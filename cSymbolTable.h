@@ -11,12 +11,35 @@
 //
 
 #include "cSymbol.h"
+#include "cAstNode.h"
 #include <unordered_map>
 #include <list>
 
 using std::unordered_map;
 using std::list;
-typedef unordered_map<string, cSymbol*> map;
+
+class symbolTable_t : public cAstNode
+{
+public:
+    symbolTable_t() : cAstNode () {}
+
+    void Insert(cSymbol * sym)
+    {
+        map[sym->GetName()] = sym;
+    }
+    
+    cSymbol* Find(string x)
+    {
+        unordered_map<string, cSymbol*>::const_iterator got = map.find(x);
+        if(got == map.end()) return nullptr;
+        else return got->second;
+    }
+
+    virtual string NodeType() {return string("symbolTable");} //      { return "AST"; }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
+
+    unordered_map<string, cSymbol*> map;
+};
 
 class cSymbolTable
 {
@@ -24,14 +47,24 @@ class cSymbolTable
         // CREATE A SYMBOL TABLE
         cSymbolTable()
         {
-            
+            cSymbol * character = new cSymbol("char");
+            character->SetType(true);
+            g_list.front()->Insert(character);
+
+            cSymbol * integer = new cSymbol("int");
+            integer->SetType(true);
+            g_list.front()->Insert(integer);
+
+            cSymbol * flo = new cSymbol("float");
+            flo->SetType(true);
+            g_list.front()->Insert(flo);
         }
 
         // INCREASE THE SCOPE: ADD A LEVEL TO THE NESTED SYMBOL TABLE
         // RETURN VALUE IS THE NEWLY CREATED SCOPE        
-        map *IncreaseScope()
+        symbolTable_t *IncreaseScope()
         {
-            map * temp = new map();
+            symbolTable_t * temp = new symbolTable_t();
             g_list.push_front(temp);
             return temp;
         }
@@ -41,7 +74,7 @@ class cSymbolTable
         //
         // NOTE: DO NOT CLEAN UP MEMORY AFTER POPING THE TABLE. PARTS OF THE
         // AST WILL PROBABLY CONTAIN POINTERS TO SYMBOLS IN THE POPPED TABLE.
-        map *DecreaseScope()
+        symbolTable_t *DecreaseScope()
         {
             g_list.pop_front();
             return g_list.front();
@@ -51,7 +84,7 @@ class cSymbolTable
         // ASSUMES THE SYMBOL IS NOT ALREADY IN THE TABLE
         void Insert(cSymbol *sym)
         {
-            (*g_list.front())[sym->GetName()] = sym;
+            g_list.front()->Insert(sym);
         }
 
         // DO A LOOKUP IN THE NESTED TABLE. 
@@ -59,11 +92,11 @@ class cSymbolTable
         // RETURNS NULLPTR IF NO MATCH IS FOUND.
         cSymbol *Find(string name)
         {
-            cSymbol * sym;
-            for(map* scope : g_list)
+            cSymbol * sym = nullptr;
+            for(symbolTable_t* scope : g_list)
             {
-                sym = (*scope)[name];
-                if(sym != nullptr)
+                sym = scope->Find(name);
+                if(sym)
                 {
                     return sym;
                 }
@@ -75,12 +108,12 @@ class cSymbolTable
         // NOTE: DOES NOT SEARCH NESTED SCOPES, ONLY THE OUTERMOST SCOPE.
         // RETURN THE SYMBOL IF FOUND.
         // RETURNS NULLPTR IF THE SYMBOL IS NOT FOUND.
-        cSymbol *FindLocal(string name)
+        cSymbol *FindLocal(symbolTable_t* scope, string name)
         {
-            return (*g_list.front())[name];
+            return g_list.front()->Find(name);
         }
 protected:
-        list<map*> g_list;
+        list<symbolTable_t*> g_list;
 };
 
 // DECLARATION FOR THE GLOBAL SYMBOL TABLE.

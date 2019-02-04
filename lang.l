@@ -8,8 +8,9 @@
 //
 
 #include "lex.h"
-#include "tokens.h"
 #include "cSymbolTable.h"
+#include "astnodes.h"
+#include "langparse.h"
 #include <list>
 using std::list;
 // Macros that can be used to create debug output from the scanner
@@ -26,9 +27,8 @@ int identifier();
 int increaseScope();
 int decreaseScope();
 
-typedef unordered_map<string, cSymbol*> map;
-map *currentTable;
-extern list<cSymbolTable> g_list;
+symbolTable_t *currentTable;
+extern list<symbolTable_t*> g_list;
 extern cSymbolTable g_symbolTable;
 
 %}
@@ -41,8 +41,8 @@ extern cSymbolTable g_symbolTable;
 %%
 "("                         DO_RETURN('(');
 ")"                         DO_RETURN(')');
-"{"                         DO_RETURN(increaseScope());
-"}"                         DO_RETURN(decreaseScope());
+"{"                         DO_RETURN('{');
+"}"                         DO_RETURN('}');
 "["                         DO_RETURN('[');
 "]"                         DO_RETURN(']');
 ";"                         DO_RETURN(';');
@@ -66,15 +66,17 @@ extern cSymbolTable g_symbolTable;
 "endif"                     DO_RETURN(ENDIF);
 "while"                     DO_RETURN(WHILE);
 "print"                     DO_RETURN(PRINT);
-"int"                       DO_RETURN(INT);
-"float"                     DO_RETURN(FLOAT);
-"char"                      DO_RETURN(CHAR);
 "struct"                    DO_RETURN(STRUCT);
 "array"                     DO_RETURN(ARRAY);
 "return"                    DO_RETURN(RETURN);
-
-[0-9]+                      DO_RETURN(INT_VAL);
-[0-9]+[.][0-9]+             DO_RETURN(FLOAT_VAL);
+[0-9]+                      {
+                               yylval.int_val = atoi(yytext);
+                               DO_RETURN(INT_VAL);
+                            }
+[0-9]+[.][0-9]+             {
+                                yylval.float_val = atof(yytext);
+                                DO_RETURN(FLOAT_VAL);
+                            }
 [_a-zA-Z][_a-zA-Z0-9]*      DO_RETURN(identifier());
 
 [ \n\t\r\f]+                {} 
@@ -97,18 +99,17 @@ int increaseScope() {
 }
 
 int identifier() {
-    cSymbol * sym = g_symbolTable.FindLocal(yytext);
+    cSymbol * sym = g_symbolTable.Find(yytext);
     if (sym == nullptr) {
         cSymbol * temp = new cSymbol(yytext);
-        g_symbolTable.Insert(temp);
-        yylval.symbol = temp;
+        yylval.symbol = temp;        
     }
     else
     {
         yylval.symbol = sym;
     }
-    return IDENTIFIER;
-    
+    if(sym->IsIdentifier()) return IDENTIFIER;
+    else return TYPE_ID;
 }
 
 int decreaseScope()
