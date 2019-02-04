@@ -19,6 +19,7 @@ cVarDeclNode(cSymbol* type, cSymbol* name) : cDeclNode()
     {
         AddChild(type);
         AddChild(name);
+        g_symbolTable.Insert(name);
     }
 
     virtual string NodeType() { return string("var_decl"); }

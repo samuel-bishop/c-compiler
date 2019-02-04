@@ -51,4 +51,7 @@ void cVisitor::Visit(cProgramNode *node)      { VisitAllChildren(node); }
 void cVisitor::Visit(cStmtNode *node)         { VisitAllChildren(node); }
 void cVisitor::Visit(cStmtsNode *node)        { VisitAllChildren(node); }
 void cVisitor::Visit(cSymbol *node)           { VisitAllChildren(node); }
-
+void cVisitor::Visit(cVarDeclNode *node)      { VisitAllChildren(node); }
+void cVisitor::Visit(cVarExprNode *node)      { VisitAllChildren(node); }
+void cVisitor::Visit(cBinaryExprNode *node)   { VisitAllChildren(node); }
+void cVisitor::Visit(cFloatExprNode *node)    { VisitAllChildren(node); }

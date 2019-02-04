@@ -33,6 +33,7 @@
     cDeclNode*      decl_node;
     cVarDeclNode*   vardecl_node;
     cVarExprNode*   varexpr_node;
+    symbolTable_t*  symbol_table;
     }
 
 %{
@@ -61,8 +62,8 @@
 
 %type <program_node> program
 %type <block_node> block
-%type <ast_node> open
-%type <ast_node> close
+%type <symbol_table> open
+%type <symbol_table> close
 %type <decls_node> decls
 %type <decl_node> decl
 %type <vardecl_node> var_decl
@@ -83,7 +84,7 @@
 %type <expr_node> addit
 %type <expr_node> term
 %type <expr_node> fact
-%type <varexpr_node> varref
+%type <symbol> varref
 %type <symbol> varpart
 
 %%
@@ -102,9 +103,7 @@ open:   '{'                     {  $$ = g_symbolTable.IncreaseScope(); }
 
 close:  '}'                     {  $$ = g_symbolTable.DecreaseScope(); }
 
-decls:      decls decl          { $$ = $1;
-                                  $$->AddChild($2);
-                                }
+decls:      decls decl          { $$->Insert($2); }
         |   decl                { $$ = new cDeclsNode($1); }
 decl:       var_decl ';'        { $$ = $1; }
         |   struct_decl ';'     {  }
@@ -112,7 +111,7 @@ decl:       var_decl ';'        { $$ = $1; }
         |   func_decl           {  }
         |   error ';'           {  }
 
-var_decl:   TYPE_ID IDENTIFIER  { $$ = new cVarDeclNode($1, $2); g_symbolTable.Insert($2); }
+var_decl:   TYPE_ID IDENTIFIER  { $$ = new cVarDeclNode($1, $2); }
 struct_decl:  STRUCT open decls close IDENTIFIER    
                                 {  }
 array_decl: ARRAY TYPE_ID '[' INT_VAL ']' IDENTIFIER
@@ -135,9 +134,7 @@ paramsspec: paramsspec',' paramspec
 
 paramspec:  var_decl            {  }
 
-stmts:      stmts stmt          { $$ = $1;
-                                  $$->AddChild($2);
-                                }
+stmts:      stmts stmt          { $$->Insert($2); }
         |   stmt                { $$ = new cStmtsNode($1); }
 
 stmt:       IF '(' expr ')' stmts ENDIF ';'
@@ -160,9 +157,9 @@ func_call:  IDENTIFIER '(' params ')' {  }
 
 varref:   varref '.' varpart    {  }
         | varref '[' expr ']'   {  }
-        | varpart               {  }
+        | varpart               { $$ = $1; }
 
-varpart:  IDENTIFIER            {  }
+varpart:  IDENTIFIER            { $$ = g_symbolTable.Find($1->GetName()); }
 
 lval:     varref                { $$ = new cVarExprNode($1); }
 

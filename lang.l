@@ -9,7 +9,6 @@
 
 #include "lex.h"
 #include "cSymbolTable.h"
-#include "astnodes.h"
 #include "langparse.h"
 #include <list>
 using std::list;
@@ -17,8 +16,8 @@ using std::list;
 // The first one does NOT create debug output, the second does.
 // Uncomment one or the other then use DO_RETURN(val) for all your return 
 // statements
-#define DO_RETURN(a) { return (a); }
-//#define DO_RETURN(a) { return Return(a); }
+//#define DO_RETURN(a) { return (a); }
+#define DO_RETURN(a) { return Return(a); }
 
 int Return(int val);
 cSymbolTable *IncreaseScope();
@@ -93,11 +92,6 @@ int Return(int val)
     return val;
 }
 
-int increaseScope() {
-    currentTable = g_symbolTable.IncreaseScope();
-    return '{';
-}
-
 int identifier() {
     cSymbol * sym = g_symbolTable.Find(yytext);
     if (sym == nullptr) {
@@ -108,12 +102,6 @@ int identifier() {
     {
         yylval.symbol = sym;
     }
-    if(sym->IsIdentifier()) return IDENTIFIER;
-    else return TYPE_ID;
-}
-
-int decreaseScope()
-{
-    currentTable = g_symbolTable.DecreaseScope();
-    return '}';
+    if(yylval.symbol->IsType()) { return TYPE_ID; }
+    else { return IDENTIFIER; }
 }

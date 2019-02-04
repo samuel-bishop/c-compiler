@@ -46,6 +46,10 @@ class cVisitor
         virtual void Visit(cStmtNode *node);
         virtual void Visit(cStmtsNode *node);
         virtual void Visit(cSymbol *node);
+        virtual void Visit(cBinaryExprNode *node);
+        virtual void Visit(cFloatExprNode *node);
+        virtual void Visit(cVarExprNode *node);
+        virtual void Visit(cVarDeclNode *node);
     protected:
         void PreVisitAllNodes(cAstNode *node);
         void PostVisitAllNodes(cAstNode *node);

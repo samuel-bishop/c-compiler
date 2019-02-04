@@ -28,7 +28,7 @@ cSymbol(string name) : cAstNode()
 
         // return name of symbol
         string GetName() { return m_name; }
-        bool IsIdentifier() { return m_type; }
+        bool IsType() { return m_type; }
         void SetType(bool t) { m_type = t; }
         virtual string AttributesToString()
         {
@@ -37,7 +37,7 @@ cSymbol(string name) : cAstNode()
             result += "\" name=\"" + m_name + "\"";
             return result;
         }
-        virtual string NodeType() { return string("sym"); }
+        virtual string NodeType() { return string("symbol"); }
         virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
     protected:
         static long long nextId;        // Next avail symbol ID

@@ -15,13 +15,13 @@ class cVarExprNode : public cExprNode
 {
 public:
     // param is first stmt in the list of statements
-cVarExprNode(cVarExprNode *sym) : cExprNode()
+cVarExprNode(cSymbol *sym) : cExprNode()
     {
         AddChild(sym);
     }
 
     // Add a statement to the list
-    void Insert(cVarExprNode * sym)
+    void Insert(cSymbol *sym)
     {
         AddChild(sym);
     }

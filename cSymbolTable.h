@@ -18,10 +18,10 @@
 using std::unordered_map;
 using std::list;
 
-class symbolTable_t : public cAstNode
+class symbolTable_t
 {
 public:
-    symbolTable_t() : cAstNode () {}
+    symbolTable_t(){}
 
     void Insert(cSymbol * sym)
     {
@@ -34,9 +34,6 @@ public:
         if(got == map.end()) return nullptr;
         else return got->second;
     }
-
-    virtual string NodeType() {return string("symbolTable");} //      { return "AST"; }
-    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
     unordered_map<string, cSymbol*> map;
 };
@@ -96,7 +93,7 @@ class cSymbolTable
             for(symbolTable_t* scope : g_list)
             {
                 sym = scope->Find(name);
-                if(sym)
+                if(sym != nullptr)
                 {
                     return sym;
                 }
@@ -108,7 +105,7 @@ class cSymbolTable
         // NOTE: DOES NOT SEARCH NESTED SCOPES, ONLY THE OUTERMOST SCOPE.
         // RETURN THE SYMBOL IF FOUND.
         // RETURNS NULLPTR IF THE SYMBOL IS NOT FOUND.
-        cSymbol *FindLocal(symbolTable_t* scope, string name)
+        cSymbol *FindLocal(string name)
         {
             return g_list.front()->Find(name);
         }
