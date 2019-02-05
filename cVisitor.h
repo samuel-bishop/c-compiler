@@ -28,6 +28,8 @@ class cBinaryExprNode;
 class cFloatExprNode;
 class cIfNode;
 class cReturnNode;
+class cWhileNode;
+class cAssignNode;
 
 class cVisitor
 {
@@ -54,6 +56,8 @@ class cVisitor
         virtual void Visit(cVarDeclNode *node);
         virtual void Visit(cIfNode *node);
         virtual void Visit(cReturnNode *node);
+        virtual void Visit(cWhileNode *node);
+        virtual void Visit(cAssignNode *node);
 
     protected:
         void PreVisitAllNodes(cAstNode *node);

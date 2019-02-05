@@ -28,3 +28,5 @@
 #include "cBinaryExprNode.h"
 #include "cIfNode.h"
 #include "cReturnNode.h"
+#include "cWhileNode.h"
+#include "cAssignNode.h"
