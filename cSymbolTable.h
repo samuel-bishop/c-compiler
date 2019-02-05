@@ -18,10 +18,13 @@
 using std::unordered_map;
 using std::list;
 
-class symbolTable_t
+class symbolTable_t: public cAstNode
 {
 public:
-    symbolTable_t(){}
+    symbolTable_t(): cAstNode()
+    {
+
+    }
 
     void Insert(cSymbol * sym)
     {
@@ -34,6 +37,9 @@ public:
         if(got == map.end()) return nullptr;
         else return got->second;
     }
+
+    virtual string NodeType() { return string("stmt"); }
+    virtual void Visit(cVisitor *visitor) { visitor->Visit(this); }
 
     unordered_map<string, cSymbol*> map;
 };

@@ -122,14 +122,14 @@ array_decl: ARRAY TYPE_ID '[' INT_VAL ']' IDENTIFIER
                                 {  }
 
 func_decl:  func_header ';'
-                                {  }
+                                { $$ = g_symbolTable.DecreaseScope(); }
         |   func_header  '{' decls stmts '}'
-                                {  }
+                                { $$ = g_symbolTable.DecreaseScope(); }
         |   func_header  '{' stmts '}'
-                                {  }
+                                { $$ = g_symbolTable.DecreaseScope(); }
 func_header: func_prefix paramsspec ')'
-                                {  }
-        |    func_prefix ')'    {  }
+                                { $$ = g_symbolTable.IncreaseScope(); }
+        |    func_prefix ')'    { $$ = g_symbolTable.IncreaseScope(); }
 func_prefix: TYPE_ID IDENTIFIER '('
                                 {  }
 paramsspec: paramsspec',' paramspec 
@@ -152,7 +152,7 @@ stmt:       IF '(' expr ')' stmts ENDIF ';'
         |   lval '=' expr ';'   { $$ = new cAssignNode($1, $3); }
         |   lval '=' func_call ';'   {  }
         |   func_call ';'       {  }
-        |   block               {  }
+        |   block               { $$ = $1; }
         |   RETURN expr ';'     { $$ = new cReturnNode($2); }
         |   error ';'           {}
 

@@ -18,8 +18,18 @@ public:
 cVarDeclNode(cSymbol* type, cSymbol* name) : cDeclNode()
     {
         AddChild(type);
-        AddChild(name);
-        g_symbolTable.Insert(name);
+
+        if(!(g_symbolTable.Find(name->GetName())))
+        {
+            g_symbolTable.Insert(name);
+            AddChild(name);
+        }
+        else
+        {
+            cSymbol *newSym = new cSymbol(name->GetName());
+            g_symbolTable.Insert(newSym);
+            AddChild(newSym);
+        }
     }
 
     virtual string NodeType() { return string("var_decl"); }
