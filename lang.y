@@ -38,6 +38,7 @@
     cReturnNode*    return_node;
     cWhileNode*     while_node;
     cAssignNode*    assign_node;
+    cStructDeclNode* struct_node;
     }
 
 %{
@@ -71,7 +72,7 @@
 %type <decls_node> decls
 %type <decl_node> decl
 %type <vardecl_node> var_decl
-%type <ast_node> struct_decl
+%type <struct_node> struct_decl
 %type <ast_node> array_decl
 %type <ast_node> func_decl
 %type <ast_node> func_header
@@ -88,7 +89,7 @@
 %type <expr_node> addit
 %type <expr_node> term
 %type <expr_node> fact
-%type <symbol> varref
+%type <varexpr_node> varref
 %type <symbol> varpart
 
 %%
@@ -110,14 +111,14 @@ close:  '}'                     {  $$ = g_symbolTable.DecreaseScope(); }
 decls:      decls decl          { $$->Insert($2); }
         |   decl                { $$ = new cDeclsNode($1); }
 decl:       var_decl ';'        { $$ = $1; }
-        |   struct_decl ';'     {  }
+        |   struct_decl ';'     { $$ = $1; }
         |   array_decl ';'      {  }
         |   func_decl           {  }
         |   error ';'           {  }
 
 var_decl:   TYPE_ID IDENTIFIER  { $$ = new cVarDeclNode($1, $2); }
 struct_decl:  STRUCT open decls close IDENTIFIER    
-                                {  }
+                                { $$ = new cStructDeclNode($3, $5); }
 array_decl: ARRAY TYPE_ID '[' INT_VAL ']' IDENTIFIER
                                 {  }
 
@@ -159,13 +160,13 @@ stmt:       IF '(' expr ')' stmts ENDIF ';'
 func_call:  IDENTIFIER '(' params ')' {  }
         |   IDENTIFIER '(' ')'  {  }
 
-varref:   varref '.' varpart    {  }
+varref:   varref '.' varpart    { $$->Insert($3); }
         | varref '[' expr ']'   {  }
-        | varpart               { $$ = $1; }
+        | varpart               { $$ = new cVarExprNode($1); }
 
 varpart:  IDENTIFIER            { $$ = g_symbolTable.Find($1->GetName()); }
 
-lval:     varref                { $$ = new cVarExprNode($1); }
+lval:     varref                { $$ = $1; }
 
 params:     params',' param     {  }
         |   param               {  }
@@ -187,7 +188,7 @@ term:       term '*' fact       { $$ = new cBinaryExprNode($1, new cOpNode('*'),
 fact:        '(' expr ')'       { $$ = $2; }
         |   INT_VAL             { $$ = new cIntExprNode($1); }
         |   FLOAT_VAL           { $$ = new cFloatExprNode($1); }
-        |   varref              { $$ = new cVarExprNode($1); }
+        |   varref              { $$ = $1; }
 
 %%
 

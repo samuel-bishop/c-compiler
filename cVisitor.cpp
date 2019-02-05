@@ -59,3 +59,4 @@ void cVisitor::Visit(cIfNode *node)           { VisitAllChildren(node); }
 void cVisitor::Visit(cReturnNode *node)       { VisitAllChildren(node); }
 void cVisitor::Visit(cWhileNode *node)        { VisitAllChildren(node); }
 void cVisitor::Visit(cAssignNode *node)       { VisitAllChildren(node); }
+void cVisitor::Visit(cStructDeclNode *node)   { VisitAllChildren(node); }
